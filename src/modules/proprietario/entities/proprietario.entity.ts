@@ -1,5 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { TipoProprietario } from '../enum/enums';
+import type { UF } from 'src/modules/shared/types/uf.type';
 
 @Entity({ name: 'proprietarios' })
 export class Proprietario {
@@ -11,4 +12,22 @@ export class Proprietario {
 
   @Column({ name: 'tipo_proprietario', type: 'enum', nullable: false })
   tipo_proprietario: TipoProprietario;
+
+  @Column({ name: 'cpf_cnpj', nullable: false })
+  cpf_cnpj: string;
+
+  @Column({ name: 'data_nascimento', type: 'date', nullable: true })
+  data_nascimento: Date;
+
+  @Column({ name: 'representante_legal', nullable: true })
+  representante_legal: string;
+
+  @Column({ name: 'endereco', nullable: false })
+  endereco: string;
+
+  @Column({ name: 'municipio', nullable: false })
+  municipio: string;
+
+  @Column({ name: 'uf', length: 2, nullable: false })
+  uf: UF;
 }
