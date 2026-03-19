@@ -1,6 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { DebitoModule } from './modules/debito/debito.module';
+import { PlacaModule } from './modules/placa/placa.module';
+import { ProprietarioModule } from './modules/proprietario/proprietario.module';
+import { RestricaoModule } from './modules/restricao/restricao.module';
+import { VeiculoModule } from './modules/veiculo/veiculo.module';
 
 @Module({
   imports: [
@@ -17,6 +22,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       autoLoadEntities: true,
       synchronize: true,
     }),
+    VeiculoModule,
+    PlacaModule,
+    ProprietarioModule,
+    DebitoModule,
+    RestricaoModule,
   ],
   controllers: [],
   providers: [],
