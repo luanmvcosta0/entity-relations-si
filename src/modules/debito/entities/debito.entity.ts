@@ -1,4 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Veiculo } from 'src/modules/veiculo/entities/veiculo.entity';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity({ name: 'debito' })
 export class Debito {
@@ -16,4 +23,8 @@ export class Debito {
 
   @Column({ name: 'status_pagamento', nullable: false })
   status_pagamento: string;
+
+  @ManyToOne(() => Veiculo, (veiculo) => veiculo.debitos)
+  @JoinColumn({ name: 'renavam' })
+  veiculo: Veiculo;
 }

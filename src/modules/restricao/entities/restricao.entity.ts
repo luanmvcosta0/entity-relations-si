@@ -1,4 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Veiculo } from 'src/modules/veiculo/entities/veiculo.entity';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity({ name: 'restricao' })
 export class Restricao {
@@ -13,4 +20,8 @@ export class Restricao {
 
   @Column({ name: 'data_registro', type: 'timestamp', nullable: false })
   data_registro: Date;
+
+  @ManyToOne(() => Veiculo, (veiculo) => veiculo.restricoes)
+  @JoinColumn({ name: 'renavam' })
+  veiculo: Veiculo;
 }

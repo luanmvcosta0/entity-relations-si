@@ -1,10 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import type {
   CategoriaVeiculo,
   CorTarja,
   StatusPlaca,
 } from '../types/placa.types';
 import type { UF } from 'src/modules/shared/types/uf.type';
+import { Veiculo } from 'src/modules/veiculo/entities/veiculo.entity';
 
 @Entity({ name: 'placas' })
 export class Placa {
@@ -31,4 +32,7 @@ export class Placa {
 
   @Column({ name: 'status_placa', nullable: false })
   status_placa: StatusPlaca;
+
+  @OneToOne(() => Veiculo, (veiculo) => veiculo.placa)
+  veiculo: Veiculo;
 }
