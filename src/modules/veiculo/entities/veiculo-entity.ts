@@ -1,4 +1,7 @@
-export class VeiculoEntity {
+import { Entity } from 'typeorm';
+
+@Entity({ name: 'veiculos' })
+export class Veiculo {
   renavam: number;
   chassi: string;
   marca: string;
