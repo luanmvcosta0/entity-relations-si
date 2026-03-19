@@ -1,6 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { TipoProprietario } from '../enum/enums';
 import type { UF } from 'src/modules/shared/types/uf.type';
+import { Veiculo } from 'src/modules/veiculo/entities/veiculo.entity';
 
 @Entity({ name: 'proprietarios' })
 export class Proprietario {
@@ -30,4 +31,7 @@ export class Proprietario {
 
   @Column({ name: 'uf', length: 2, nullable: false })
   uf: UF;
+
+  @OneToMany(() => Veiculo, (veiculo) => veiculo.proprietario)
+  veiculos: Veiculo[];
 }

@@ -1,4 +1,16 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Debito } from 'src/modules/debito/entities/debito.entity';
+import { Placa } from 'src/modules/placa/entities/placa.entity';
+import { Proprietario } from 'src/modules/proprietario/entities/proprietario.entity';
+import { Restricao } from 'src/modules/restricao/entities/restricao.entity';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity({ name: 'veiculos' })
 export class Veiculo {
@@ -37,4 +49,18 @@ export class Veiculo {
 
   @Column({ name: 'peso_bruto_total', type: 'decimal', nullable: true })
   peso_bruto_total: number;
+
+  @OneToOne(() => Placa)
+  @JoinColumn({ name: 'id_placa' })
+  placa: Placa;
+
+  @OneToMany(() => Debito, (debito) => debito.veiculo)
+  debitos: Debito[];
+
+  @OneToMany(() => Restricao, (restricao) => restricao.veiculo)
+  restricoes: Restricao[];
+
+  @ManyToOne(() => Proprietario, (proprietario) => proprietario.veiculos)
+  @JoinColumn({ name: 'id_proprietario' })
+  proprietario: Proprietario;
 }
