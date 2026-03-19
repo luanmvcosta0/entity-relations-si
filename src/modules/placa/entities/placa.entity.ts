@@ -3,8 +3,8 @@ import type {
   CategoriaVeiculo,
   CorTarja,
   StatusPlaca,
-  UF,
 } from '../types/placa.types';
+import type { UF } from 'src/modules/shared/types/uf.type';
 
 @Entity({ name: 'placas' })
 export class Placa {
