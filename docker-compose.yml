@@ -4,10 +4,9 @@ services:
   postgres:
     image: postgres:15
     container_name: postgres_db
-    restart: always
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
       POSTGRES_DB: veiculos_db
     ports:
       - '5432:5432'
@@ -22,11 +21,11 @@ services:
     depends_on:
       - postgres
     environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USER: admin
-      DB_PASS: admin
-      DB_NAME: veiculos_db
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: 123456
+      DATABASE_DATABASE: veiculos_db
 
 volumes:
   postgres_data:
