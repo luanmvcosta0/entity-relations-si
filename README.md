@@ -1,98 +1,163 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 🚗 Entity Relations — Modelagem de Veículos com ORM
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Projeto acadêmico desenvolvido para a disciplina de **Business Intelligence** (7º período) do curso de **Sistemas de Informação**.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+A atividade original propunha a modelagem do banco de dados diretamente via SQL, mas optei por implementá-la com **ORM (TypeORM + NestJS)** — mapeando as entidades e seus relacionamentos em código — como forma de também treinar a stack que utilizo profissionalmente.
 
-## Description
+O domínio modelado é um **sistema de registro de veículos** (no estilo DETRAN), envolvendo proprietários, veículos, placas, débitos e restrições.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 🗂️ Modelo de dados
 
-## Project setup
+```mermaid
+erDiagram
+    PROPRIETARIO ||--o{ VEICULO : possui
+    VEICULO ||--|| PLACA : "registrado com"
+    VEICULO ||--o{ DEBITO : "possui"
+    VEICULO ||--o{ RESTRICAO : "possui"
 
-```bash
-$ npm install
+    PROPRIETARIO {
+        uuid id_proprietario PK
+        string nome_proprietario
+        enum tipo_proprietario "FISICA | JURIDICA"
+        string cpf_cnpj
+        date data_nascimento
+        string representante_legal
+        string endereco
+        string municipio
+        string uf
+    }
+
+    VEICULO {
+        int renavam PK
+        string chassi UK
+        string marca
+        string modelo
+        string versao
+        string ano_fabricacao
+        int ano_modelo
+        string cor_predominante
+        int capacidade_passageiros
+        decimal peso_bruto_total
+    }
+
+    PLACA {
+        uuid id_placa PK
+        string numero_placa
+        string qr_code
+        string uf_registro
+        string municipio_registro
+        string categoria_veiculo
+        string cor_tarja
+        string status_placa
+    }
+
+    DEBITO {
+        uuid id_debito PK
+        string tipo_debito
+        decimal valor
+        date data_vencimento
+        string status_pagamento
+    }
+
+    RESTRICAO {
+        uuid id_restricao PK
+        string tipo_restricao
+        string descricao
+        timestamp data_registro
+    }
 ```
 
-## Compile and run the project
+### Relacionamentos mapeados
 
-```bash
-# development
-$ npm run start
+| Relação | Cardinalidade | Mapeamento TypeORM |
+|---------|---------------|--------------------|
+| Proprietário → Veículos | 1 : N | `@OneToMany` / `@ManyToOne` |
+| Veículo → Placa | 1 : 1 | `@OneToOne` + `@JoinColumn` |
+| Veículo → Débitos | 1 : N | `@OneToMany` / `@ManyToOne` |
+| Veículo → Restrições | 1 : N | `@OneToMany` / `@ManyToOne` |
 
-# watch mode
-$ npm run start:dev
+As entidades também utilizam **tipagem forte com TypeScript** para domínios de valores, como `UF` (unidades federativas), `CategoriaVeiculo`, `CorTarja`, `StatusPlaca` e o enum `TipoProprietario` (pessoa física/jurídica).
 
-# production mode
-$ npm run start:prod
+## 🛠️ Tecnologias
+
+- **NestJS 11** — framework Node.js
+- **TypeORM** — mapeamento objeto-relacional
+- **PostgreSQL 15** — banco de dados
+- **TypeScript**
+- **Docker + Docker Compose** — containerização da aplicação e do banco
+- **Jest** — estrutura de testes
+
+## 📁 Estrutura
+
+O projeto segue uma organização modular por domínio:
+
+```
+src/
+├── modules/
+│   ├── proprietario/
+│   │   ├── entities/proprietario.entity.ts
+│   │   └── enum/enums.ts
+│   ├── veiculo/
+│   │   └── entities/veiculo.entity.ts
+│   ├── placa/
+│   │   ├── entities/placa.entity.ts
+│   │   └── types/placa.types.ts
+│   ├── debito/
+│   │   └── entities/debito.entity.ts
+│   ├── restricao/
+│   │   └── entities/restricao.entity.ts
+│   └── shared/
+│       └── types/uf.type.ts
+├── app.module.ts
+└── main.ts
 ```
 
-## Run tests
+## ▶️ Como executar
+
+### Com Docker (recomendado)
+
+Sobe a aplicação e o PostgreSQL juntos:
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+git clone https://github.com/luanmvcosta0/entity-relations-si.git
+cd entity-relations-si
+docker-compose up --build
 ```
 
-## Deployment
+A API sobe em `http://localhost:3000` e o banco em `localhost:5432` (database `veiculos_db`).
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+Com `synchronize: true` habilitado no TypeORM, as tabelas e relacionamentos são **criados automaticamente** no banco a partir das entidades — que é justamente o objetivo do exercício: ver o modelo relacional ser gerado a partir do mapeamento ORM.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### Localmente (sem Docker)
+
+Pré-requisitos: Node.js e um PostgreSQL rodando.
+
+Crie um arquivo `.env` na raiz:
+
+```env
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_USERNAME=postgres
+DATABASE_PASSWORD=123456
+DATABASE_DATABASE=veiculos_db
+```
+
+E rode:
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npm install
+npm run start:dev
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## 📚 Conceitos praticados
 
-## Resources
+- Modelagem entidade-relacionamento (1:1, 1:N)
+- Mapeamento objeto-relacional com decorators do TypeORM
+- Geração automática de schema a partir das entidades (`synchronize`)
+- Organização modular de projetos NestJS
+- Tipagem de domínios de valores com TypeScript (union types e enums)
+- Containerização de aplicação + banco com Docker Compose
 
-Check out a few resources that may come in handy when working with NestJS:
+## 🎓 Contexto acadêmico
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Atividade da cadeira de **Business Intelligence** — 7º período de **Sistemas de Informação** — com foco em modelagem de dados e relacionamentos entre entidades, implementada via ORM como exercício complementar da stack Node/NestJS.
